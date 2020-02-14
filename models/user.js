@@ -16,8 +16,8 @@ User.prototype.save = () => {
     .insertOne(this);
 }
 
-//non-static
-User.prototype.addToCart = (product) => {
+//non-static (dont use arrow, this involved)
+User.prototype.addToCart = function (product) {
     // const cartProduct = this.cart.items.findIndex( cp => {
     //     return cp._id === product._id;
     // }); //will return -1 if not found
@@ -29,7 +29,7 @@ User.prototype.addToCart = (product) => {
     .collection('users')
     .updateOne( 
         { _id: new mongoDb.ObjectId(this._id) }, 
-        {$set: {cart: updatedCart }} 
+        { $set: {cart:updatedCart} } 
     );
 }
 
