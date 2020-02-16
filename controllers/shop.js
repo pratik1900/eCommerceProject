@@ -44,9 +44,6 @@ module.exports.getProduct = (req, res, next) => {
 //Logic for rendering and displaying Cart items
 module.exports.getCart = (req, res, next) => {
     req.user.getCart()
-    .then( cart => {
-        return cart.getProducts(); //Another Sequelize "magic" function, usable because of association 
-    })
     .then( products => {
         res.render('shop/cart', {
             pageTitle: 'Your Cart',
@@ -70,49 +67,39 @@ module.exports.postCart = (req, res, next) => {
         res.redirect('/cart');
     })
     .catch( err => console.log(err));
-    // let fetchedCart;
-    // req.user.getCart()
-    // .then( cart => {
-    //     fetchedCart = cart; //making it available to parent scope
-    //     //checking to see if item already present in cart, if yes, just increase quantity
-    //     return cart.getProducts({where: {id:prodId} })
-    // })
-    // .then( products => {
-    //     let product;
-    //     if(products.length > 0){
-    //         product = products[0];
-    //     }
-    //     let newQuantity = 1;
-    //     if(product) {
-    //         const oldQuantity = product.cartItem.quantity;
-    //         newQuantity = oldQuantity + 1;
-    //         return fetchedCart.addProduct(product, { through: {quantity: newQuantity} } );
-    //     }
-    //     return Product.findByPk(prodId)
-    //     .then( product => {
-    //         return fetchedCart.addProduct(product, { through: { quantity: newQuantity } } );
-    //     })
-    //     .catch( err => console.log(err));
-    // })
-    // .then( () => {
-    //     res.redirect('/cart');
-    // })
-    // .catch( err => console.log(err))
 }
 
-module.exports.postCartDelete = (req, res, next) => {
+module.exports.postCartDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.findById(prodId, product => {
-        Cart.deleteProduct(prodId, product.price);
+    
+    req.user.deleteItemFromCart(prodId)
+    .then( result => {
+        console.log('Product Deleted from cart');
         res.redirect('/cart');
-    });
+    })
+    .catch( err => console.log(err))
 };
 
 module.exports.getOrders = (req, res, next) => {
-    res.render('shop/orders', {
-        pageTitle: 'Your Orders',
-        path: '/orders'
-    });
+    req.user.getOrders()
+    .then( orders => {
+        console.log(orders);
+        res.render('shop/orders', {
+            pageTitle: 'Your Orders',
+            path: '/orders',
+            orders: orders
+        });
+    })
+    .catch(err => console.log(err))
+}
+
+module.exports.postOrders = (req, res, next) => {
+    req.user.addOrder()
+    .then( result => {
+        console.log('Items Ordered, removed from cart and added to order history!');
+        res.redirect('/orders');
+    })
+    .catch(err => console.log(err));
 }
 
 

@@ -8,14 +8,17 @@
                 <ul>
                     <% products.forEach( p => { %>
                         <li>
-                            <P><%= p.title %>(<%= p.cartItem.quantity %>)</P>
+                            <P><%= p.title %>(<%= p.quantity %>)</P>
                             <form action="/cart-delete-item" method="POST">
-                                <input type="hidden" name="productId" value="<%= p.id %>">
+                                <input type="hidden" name="productId" value="<%= p._id %>">
                                 <button class="btn" type="submit">Delete</button>
                             </form>
                         </li>
                     <% }); %>
                 </ul>
+                <form action="/create-order" method="POST">
+                    <button class="btn">Order</button>
+                </form>
             <% } else { %>
                 <h1>No Products in Cart.</h1>
             <% } %>

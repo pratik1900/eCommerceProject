@@ -21,7 +21,7 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 app.use( (req, res, next) => {
-    User.findById('5e43ea8da81b3115480c9ae7')
+    User.findById('5e49677424271320141b6572')
     .then( user => {
         req.user = new User(user.name, user.email, user.cart, user._id); //storing user - invoking 'new' to gain access to model methods
         next();
