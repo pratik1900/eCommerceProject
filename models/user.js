@@ -49,12 +49,26 @@ User.prototype.addToCart = function (product) {
 //non-static
 User.prototype.getCart = function() {   //1) lists product Ids of cart items (2) queries product collection using that ID list (3)queries cart collection for quantity of each item, and returns an object containing each individual product data along with the corresponding quantity
     const db = getDb();
+    const currentUser = this;
 
     //creating array containing product ids of all items in cart
     const productIds = this.cart.items.map( i => {
         return i.productId;
     });
 
+    //removing items from cart that no longer exist in the products collection
+    productIds.forEach( function(id) {
+        db.collection('products')
+        .findOne({_id: id})
+        .then(result => {
+            if(result === null){
+                currentUser.deleteItemFromCart(id);
+                console.log('One Item removed from cart as it is no longer available.');
+            }
+        })
+        .catch(err=> console.log(err));
+    });
+    
     return db.collection('products').find( {_id: {$in: productIds}} ).toArray()
     .then( products => {
         return products.map( p => {
