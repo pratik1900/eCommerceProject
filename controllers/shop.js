@@ -1,9 +1,9 @@
-const Product = require('../models/product'); //importing Product model/constructor
-// const Cart = require('../models/cart');//importing Cart model/constructor
+const Product = require('../models/product'); //importing Product model
+const Order = require('../models/order');//importing Order model 
 
 //For displaying the Index page
 module.exports.getIndex = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
     .then( products => {
         res.render('shop/index', {
             prods: products, 
@@ -16,7 +16,7 @@ module.exports.getIndex = (req, res, next) => {
 
 //For displaying the Products page
 module.exports.getProducts = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
     .then( products => {
         res.render('shop/product-list', {
             prods: products, 
@@ -43,8 +43,11 @@ module.exports.getProduct = (req, res, next) => {
 
 //Logic for rendering and displaying Cart items
 module.exports.getCart = (req, res, next) => {
-    req.user.getCart()
-    .then( products => {
+    req.user
+    .populate('cart.items.productId')
+    .execPopulate() //helps to return a promise
+    .then( user => {
+        const products = user.cart.items;
         res.render('shop/cart', {
             pageTitle: 'Your Cart',
             path: '/cart',
@@ -72,7 +75,7 @@ module.exports.postCart = (req, res, next) => {
 module.exports.postCartDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
     
-    req.user.deleteItemFromCart(prodId)
+    req.user.removeFromCart(prodId)
     .then( result => {
         console.log('Product Deleted from cart');
         res.redirect('/cart');
@@ -81,7 +84,7 @@ module.exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 module.exports.getOrders = (req, res, next) => {
-    req.user.getOrders()
+    Order.find({'user.userId' : req.user._id})
     .then( orders => {
         console.log(orders);
         res.render('shop/orders', {
@@ -94,8 +97,30 @@ module.exports.getOrders = (req, res, next) => {
 }
 
 module.exports.postOrders = (req, res, next) => {
-    req.user.addOrder()
+    req.user
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+
+        //creating the correct format to be used in Order instance creation (in accordance to the order model)
+        const products = user.cart.items.map(i => {
+            return {product: { ...i.productId._doc } , quantity: i.quantity}
+        });
+
+        const order = new Order({
+            products: products,
+
+            user: {
+                name: req.user.name,
+                userId: req.user._id
+            }
+        });
+        order.save();
+    })
     .then( result => {
+        req.user.clearCart();
+    })
+    .then(() => {
         console.log('Items Ordered, removed from cart and added to order history!');
         res.redirect('/orders');
     })

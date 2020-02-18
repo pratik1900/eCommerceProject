@@ -5,9 +5,7 @@ const errorController = require('./controllers/error');
 
 const User = require('./models/user');
 
-const mongoConnect = require('./util/database').mongoConnect;
-
-
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -21,9 +19,9 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 app.use( (req, res, next) => {
-    User.findById('5e49677424271320141b6572')
+    User.findById('5e4acf3b32ac9122c09ebc01')
     .then( user => {
-        req.user = new User(user.name, user.email, user.cart, user._id); //storing user - invoking 'new' to gain access to model methods
+        req.user = user; //user is a mongoose obj with all methods
         next();
     })
     .catch( err => console.log(err));
@@ -38,6 +36,23 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 
-mongoConnect( () => {
-    app.listen(3000, () => console.log('Server is Running!'));
-});
+mongoose.connect('mongodb+srv://pbose:kjnptGrNoNUFfHEW@cluster0-ntjvz.mongodb.net/shop?retryWrites=true&w=majority')
+.then(result => {
+    User.findOne()
+        .then( user => {
+            if (!user) {
+                const user = new User({
+                    name: 'Pratik',
+                    email: 'pratik@bose.com',
+                    cart: { items: [] }
+                });
+                user.save();
+            }
+        })
+        .catch(err => console.log(err));
+
+    app.listen(3000, () => {
+        console.log('Server Started!');
+    })
+})
+.catch(err => console.log(err));
