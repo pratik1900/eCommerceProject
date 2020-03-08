@@ -3,7 +3,7 @@ const path = require("path");
 const router = express.Router();
 
 const shopController = require('../controllers/shop');
-
+const isAuth = require('../middleware/is-auth'); //middleware that checks Log-in status
 
 
 //Index page GET
@@ -16,19 +16,19 @@ router.get( '/products', shopController.getProducts);
 router.get('/products/:productId', shopController.getProduct);
 
 // /cart => GET
-router.get( '/cart', shopController.getCart);
+router.get( '/cart', isAuth, shopController.getCart);
 
 // /cart => POST
-router.post( '/cart', shopController.postCart);
+router.post( '/cart', isAuth, shopController.postCart);
 
 // /cart-delete-item => POST
-router.post('/cart-delete-item', shopController.postCartDeleteProduct);
+router.post('/cart-delete-item', isAuth, shopController.postCartDeleteProduct);
 
 // /orders => GET
-router.get( '/orders', shopController.getOrders);
+router.get( '/orders', isAuth, shopController.getOrders);
 
 // /create-orders => POST
-router.post( '/create-order', shopController.postOrders);
+router.post( '/create-order', isAuth, shopController.postOrders);
 
 // // /checkout => GET
 // router.get( '/checkout', shopController.getCheckout);

@@ -1,12 +1,20 @@
 const bcrypt = require('bcryptjs');
+const nodemailer= require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('../models/user');
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+    auth: {
+        api_key: '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'
+    }
+}));
 
 module.exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Login',
-        isAuthenticated: false
+        errorMessage: req.flash('error') //only if it exists, else falsy
     });
 };
 
@@ -14,6 +22,7 @@ module.exports.postLogin = (req, res, next) => {
     User.findOne({ email: req.body.email })
     .then( user => {
         if (!user) {
+            req.flash('error', "Invalid E-mail or Password.");
             return res.redirect('/login');
         }
         bcrypt.compare(req.body.password, user.password) //the catch block is triggered for  ANY error, not just password mismatch (so we check again inside then)
@@ -29,6 +38,7 @@ module.exports.postLogin = (req, res, next) => {
                 });
             }
             //if they don't match
+            req.flash('error', "Invalid E-mail or Password.");
             console.log('SIGNED IN FAILED!');
             res.redirect('/login');
         })
@@ -45,7 +55,7 @@ module.exports.getSignUp = (req, res, next) => {
     res.render('auth/signup', {
         path: '/signup',
         pageTitle: 'Sign Up',
-        isAuthenticated: false
+        errorMessage: req.flash('error')
     });
 }
 
@@ -55,6 +65,7 @@ module.exports.postSignUp = (req, res, next) => {
     .then(userDoc => {
 
         if (userDoc) {
+            req.flash('error', "E-mail exists already, please pick a different one.");
             return res.redirect('/signup');
         }
 
@@ -68,7 +79,16 @@ module.exports.postSignUp = (req, res, next) => {
             return user.save();
         })
         .then(result =>{
-            res.redirect('/login');
+            res.redirect('/login'); //don't redirect after email is sent(in a then block), slows down app (do it like this, as the sending of mail doesnt have to be finished before you redirect, these are independent tasks)
+            return transporter.sendMail({   //returns promise
+                to: req.body.email,
+                from: 'shop@node-complete.com',
+                subject: 'Sign Up Complete',
+                html: '<h1> You Successfully signed up!. <h1>'
+            });
+        })
+        .catch(err => {
+            console.log(err);
         });
     })
     .catch(err => {
