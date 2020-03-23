@@ -11,7 +11,9 @@ module.exports.getIndex = (req, res, next) => {
             path: "/"
         });
     })
-    .catch( err => console.log(err));
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 //For displaying the Products page
@@ -24,7 +26,9 @@ module.exports.getProducts = (req, res, next) => {
             path: "/products"
         });
     })
-    .catch( err => console.log(err));
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 //For displaying a single product details
@@ -38,7 +42,9 @@ module.exports.getProduct = (req, res, next) => {
             path: '/products'
         });
     })
-    .catch( err => console.log(err) );
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 //Logic for rendering and displaying Cart items
@@ -55,7 +61,9 @@ module.exports.getCart = (req, res, next) => {
             products: products
         });
     })
-    .catch( err => console.log(err));
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 //adding an item to cart
@@ -70,7 +78,9 @@ module.exports.postCart = (req, res, next) => {
         console.log('Added to cart!');
         res.redirect('/cart');
     })
-    .catch( err => console.log(err));
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 module.exports.postCartDeleteProduct = (req, res, next) => {
@@ -81,7 +91,9 @@ module.exports.postCartDeleteProduct = (req, res, next) => {
         console.log('Product Deleted from cart');
         res.redirect('/cart');
     })
-    .catch( err => console.log(err))
+    .catch( err => {
+        next(new Error(err));
+    });
 };
 
 module.exports.getOrders = (req, res, next) => {
@@ -94,7 +106,9 @@ module.exports.getOrders = (req, res, next) => {
             orders: orders
         });
     })
-    .catch(err => console.log(err))
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 module.exports.postOrders = (req, res, next) => {
@@ -125,7 +139,9 @@ module.exports.postOrders = (req, res, next) => {
         console.log('Items Ordered, removed from cart and added to order history!');
         res.redirect('/orders');
     })
-    .catch(err => console.log(err));
+    .catch( err => {
+        next(new Error(err));
+    });
 }
 
 

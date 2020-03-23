@@ -53,10 +53,15 @@ app.use( (req,res,next) => {
     }
     User.findById(req.session.user._id)
     .then( user => {
+        if(!user){  //extra precaution
+            return next();
+        }
         req.user = user; //user is a mongoose obj with all methods
         next();
     })
-    .catch( err => console.log(err));
+    .catch( err => {
+        throw new Error(err);
+    });
 });
 
 
@@ -77,10 +82,15 @@ app.use('/admin', adminRoutes); //all admin routes will start with /admin/
 app.use(shopRoutes);
 app.use(authRoutes);
 
-
+app.get('/500', errorController.get500);
 //A Catch-all route for unhandled requests [ .use() will handle requests irrespective of their verb]
 app.use(errorController.get404);
 
+//error handling middleware
+app.use( (error, req, res, next) => {
+    console.log(error);
+    res.redirect('/500');
+});
 
 mongoose.connect(MONGO_URI)
 .then(result => {

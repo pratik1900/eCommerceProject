@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const nodemailer= require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator');//retrieves errors throws by validator, if any
 
 const User = require('../models/user');
 
@@ -15,16 +16,39 @@ module.exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Login',
-        errorMessage: req.flash('error') //only if it exists, else falsy
+        errorMessage: req.flash('error'), //only if it exists, else falsy
+        oldInput: { email: '', password: ''}
     });
 };
 
 module.exports.postLogin = (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    const errors = validationResult(req);   //retrieves errors throws by validator, if any
+    if(!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            pageTitle: 'Login',
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: email,
+                password: password
+            }
+        });
+    }
     User.findOne({ email: req.body.email })
     .then( user => {
         if (!user) {
-            req.flash('error', "Invalid E-mail or Password.");
-            return res.redirect('/login');
+            return res.status(422).render('auth/login', {
+                path: '/login',
+                pageTitle: 'Login',
+                errorMessage: "Incorrect E-mail or Password.",
+                oldInput: {
+                    email: email,
+                    password: password
+                }
+            });
         }
         bcrypt.compare(req.body.password, user.password) //the catch block is triggered for  ANY error, not just password mismatch (so we check again inside then)
         .then(doMatch => {
@@ -39,7 +63,15 @@ module.exports.postLogin = (req, res, next) => {
                 });
             }
             //if they don't match
-            req.flash('error', "Invalid E-mail or Password.");
+            return res.status(422).render('auth/login', {
+                path: '/login',
+                pageTitle: 'Login',
+                errorMessage: "Incorrect E-mail or Password.",
+                oldInput: {
+                    email: email,
+                    password: password
+                }
+            });
             console.log('SIGNED IN FAILED!');
             res.redirect('/login');
         })
@@ -48,7 +80,9 @@ module.exports.postLogin = (req, res, next) => {
             res.redirect('/login');
         });
     })
-    .catch( err => console.log(err));
+    .catch( err => {
+        next(new Error(err));
+    });
 };
 
 
@@ -56,46 +90,55 @@ module.exports.getSignUp = (req, res, next) => {
     res.render('auth/signup', {
         path: '/signup',
         pageTitle: 'Sign Up',
-        errorMessage: req.flash('error')
+        errorMessage: req.flash('error'),
+        oldInput: { email: '', password: '', confirmPassword: ''},
+        validationErrors: {}
     });
 }
 
 module.exports.postSignUp = (req, res, next) => {
-    //checking if user with same email exists
-    User.findOne({email: req.body.email})
-    .then(userDoc => {
+    const email = req.body.email;
+    const password = req.body.password;
+    const confirmPassword = req.body.confirmPassword;
 
-        if (userDoc) {
-            req.flash('error', "E-mail exists already, please pick a different one.");
-            return res.redirect('/signup');
-        }
 
-        return bcrypt.hash(req.body.password, 12)
-        .then(hashedPassword => {
-            const user = new User({
-                email: req.body.email,
-                password: hashedPassword,
-                cart: { items: [] }
-            });
-            return user.save();
-        })
-        .then(result =>{
-            res.redirect('/login'); //don't redirect after email is sent(in a then block), slows down app (do it like this, as the sending of mail doesnt have to be finished before you redirect, these are independent tasks)
-            return transporter.sendMail({   //returns promise
-                to: req.body.email,
-                from: 'shop@node-complete.com',
-                subject: 'Sign Up Complete',
-                html: '<h1> You Successfully signed up!. <h1>'
-            });
-        })
-        .catch(err => {
-            console.log(err);
+    const errors = validationResult(req);   //retrieves errors throws by validator, if any
+    if(!errors.isEmpty()) {
+        return res.status(422)
+        .render('auth/signup', {
+            path: '/signup',
+            pageTitle: 'Sign Up',
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword
+            },
+            validationErrors: errors.mapped()//creates an object which has a property for every field being validated, along with any existing errors (check .mapped() vs .array() diff )
+        });
+    }
+    bcrypt.hash(req.body.password, 12)
+    .then(hashedPassword => {
+        const user = new User({
+            email: req.body.email,
+            password: hashedPassword,
+            cart: { items: [] }
+        });
+        return user.save();
+    })
+    .then(result =>{
+        res.redirect('/login'); //don't redirect after email is sent(in a then block), slows down app (do it like this, as the sending of mail doesnt have to be finished before you redirect, these are independent tasks)
+        return transporter.sendMail({   //returns promise
+            to: req.body.email,
+            from: 'shop@node-complete.com',
+            subject: 'Sign Up Complete',
+            html: '<h1> You Successfully signed up!. <h1>'
         });
     })
-    .catch(err => {
-        console.log(err);
-    })
-}
+    .catch( err => {
+        next(new Error(err));
+    });
+};
 
 module.exports.postLogout = (req, res, next) => {
     req.session.destroy( err => {
@@ -145,8 +188,8 @@ module.exports.postReset = (req, res, next) => {
                 `
             });
         })
-        .catch(err => {
-            console.log(err);
+        .catch( err => {
+            next(new Error(err));
         });
     })
 };
@@ -163,9 +206,9 @@ module.exports.getNewPassword = (req, res, next) => {
             passwordToken: token
         });
     })
-    .catch(err => {
-        console.log(err);
-    })
+    .catch( err => {
+        next(new Error(err));
+    });
 };
 
 
@@ -181,7 +224,7 @@ module.exports.postNewPassword = (req, res, next) => {
         _id: userId
     })
     .then(user => {
-        resetUser = user;
+        resetUser = user;   //to make it available to the next then block
         return bcrypt.hash(newPassword, 12);
     })
     .then(hashedPassword => {
@@ -193,8 +236,7 @@ module.exports.postNewPassword = (req, res, next) => {
     .then(result => {
         res.redirect('/login');
     })
-    .catch(err => {
-        console.log(err);
-    })
-
-}
+    .catch( err => {
+        next(new Error(err));
+    });
+};
