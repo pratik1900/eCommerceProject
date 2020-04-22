@@ -33,6 +33,8 @@ router.post( '/create-order', isAuth, shopController.postOrders);
 // // /checkout => GET
 // router.get( '/checkout', shopController.getCheckout);
 
+router.get('/orders/:orderId', isAuth, shopController.getInvoice)
+
 module.exports = router;
 
   

@@ -12,6 +12,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session); //returns a constructor
 const csrf = require('csurf'); //initialize after session middleware, and body parser initialization, before routes plug-in
 const flash = require('connect-flash'); //initialize after session middleware
+const multer = require('multer');
 
 const User = require('./models/user');
 
@@ -32,8 +33,32 @@ const mongoStore = new MongoDBStore({
     collection: 'sessions'
 });
 
+//Multer config - configuring file storage and naming 
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname );
+    }
+});
+
+//Multer config - configuring file validation
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype ==='image/png'  || 
+        file.mimetype === 'image/jpg' || 
+        file.mimetype === 'image/jpeg') {
+            cb(null, true);     
+    } else {   
+            cb(null, false);
+    }
+};
+
+
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')); // storage - takes the storage configuration object, single - for single file in form; 'image' - name of the input field in the form that corresponds to the file
 app.use(express.static( path.join(__dirname, 'public') ));
+app.use('/images', express.static( path.join(__dirname, 'images') ));
 //session middleware
 app.use(session({
     secret: 'my secret',
