@@ -168,8 +168,8 @@ module.exports.getProducts = (req, res, next) => {
 };
 
 
-module.exports.postDeleteProduct = (req, res, next) => {
-    const prodId = req.body.productId;
+module.exports.deleteProduct = (req, res, next) => {
+    const prodId = req.params.productId;
 
     //deleting the product image, then the product entry in DB
     Product.findById(prodId)
@@ -182,9 +182,13 @@ module.exports.postDeleteProduct = (req, res, next) => {
     })
     .then( () => {
         console.log('PRODUCT DESTROYED');
-        res.redirect('/admin/products');
+        res.status(200).json({
+            message: "Product Deleted Successfully"
+        });
     })
     .catch( err => {
-        next(new Error(err));
+        res.status(500).json({
+            message: "Deleting product failed"
+        });
     });
 };
