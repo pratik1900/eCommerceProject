@@ -27,7 +27,7 @@ router.post(
         .isFloat(),
 
         body('description')
-        .isLength({ min: 5, max: 400 })
+        .isLength({ min: 3, max: 400 })
         .trim()
     ], 
     isAuth, 
@@ -57,7 +57,7 @@ router.post(
     adminController.postEditProduct
 );
 
-// /admin/delete-product => POST 
+// /admin/product/:productId => Delete 
 router.delete('/product/:productId', isAuth, adminController.deleteProduct);
 
 

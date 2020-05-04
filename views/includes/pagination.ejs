@@ -1,20 +1,20 @@
-<section class="pagination">
+<ul class="pagination justify-content-center">
     <% if(currentPage >= 3) {%>
-        <a href="?page=1">First</a> 
+        <li class="page-item"><a class="page-link" href="?page=1">First</a></li> 
     <% } %>
 
     <% if(hasPreviousPage) { %> 
-        <a href="?page=<%= previousPage %>"><%= previousPage %></a> 
+        <li class="page-item"><a class="page-link" href="?page=<%= previousPage %>"><%= previousPage %></a></li> 
     <% } %>
     
-    <a href="?page=<%= currentPage %>" class="active"><%= currentPage %></a>
+    <li class="page-item"><a class="page-link" href="?page=<%= currentPage %>" class="active"><%= currentPage %></a></li>
 
 
     <% if(hasNextPage) { %>
-        <a href="?page=<%= nextPage %>"><%= nextPage %></a>
+        <li class="page-item"><a class="page-link" href="?page=<%= nextPage %>"><%= nextPage %></a></li>
     <% } %>
 
     <% if(currentPage <= lastPage - 2) {%>
-        <a href="?page=<%= lastPage %>">Last</a> 
+        <li class="page-item"><a class="page-link" href="?page=<%= lastPage %>">Last</a></li> 
     <% } %>
-</section>
+</ul>

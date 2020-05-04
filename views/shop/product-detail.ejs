@@ -3,16 +3,41 @@
 
     <body>
         <%- include('../includes/navigation.ejs') %>
-        <main class="centered">
-            <h1><%= product.title %></h1>
-            <hr>
-            <div class="image">
-                <img src="/<%= product.imageUrl %>" alt="<%= product.title %>">
+        <main>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="lead">DETAILS</p>
+                        <div class="list-group">
+                            <li class="list-group-item active">Info 1</li>
+                            <li class="list-group-item">Info 2</li>
+                            <li class="list-group-item">Info 3</li>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="card">
+                            <img class="card-img-top" src="/<%= product.imageUrl %>" alt="<%= product.title %>">
+                            <div class="card-body">
+                                <h1 class="card-title">
+                                    <a href="#"><%= product.title %></a>
+                                </h1>
+                                <h3 class="card-subtitle text-muted">Price: $<%= product.price %></h3>
+                                
+                                <% if(isAuthenticated) { %>
+                                    <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+                                <% } %>
+                                <p class="card-text"> 
+                                    <%= product.description %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h2><%= product.price %></h2>
-            <p><%= product.description %></p>
-            <% if(isAuthenticated) { %>
-                <%- include('../includes/add-to-cart.ejs', {product: product}) %>
-            <% } %>
         </main>
         <%- include('../includes/end.ejs') %>
+
+        
+        
+                

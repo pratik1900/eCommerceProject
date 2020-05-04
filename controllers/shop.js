@@ -3,7 +3,7 @@ const path = require('path');
 const Pdfkit = require('pdfkit');
 const fileHelper = require('../util/file');
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 9;
 
 const Product = require('../models/product'); //importing Product model
 const Order = require('../models/order');//importing Order model 
@@ -33,6 +33,38 @@ module.exports.getProducts = (req, res, next) => {
         totalItems = numProducts;
 
         return Product.find()
+        .skip( (page - 1) * ITEMS_PER_PAGE )
+        .limit(ITEMS_PER_PAGE)
+    })
+    .then( products => {
+        res.render('shop/product-list', {
+            prods: products, 
+            pageTitle: "All Products", 
+            path: "/products",
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+        });
+    })
+    .catch( err => {
+        next(new Error(err));
+    });
+}
+
+//For displaying products of particular category
+module.exports.getCategoryProducts = (req, res, next) => {
+    const category = req.params.categoryName;
+    const page = Number(req.query.page) || 1;
+    let totalItems;
+
+    Product.countDocuments({ category: category })
+    .then(numProducts => {
+        totalItems = numProducts;
+
+        return Product.find({ category: category })
         .skip( (page - 1) * ITEMS_PER_PAGE )
         .limit(ITEMS_PER_PAGE)
     })
@@ -88,6 +120,7 @@ module.exports.getCart = (req, res, next) => {
         next(new Error(err));
     });
 }
+
 
 //adding an item to cart
 module.exports.postCart = (req, res, next) => {
@@ -169,15 +202,29 @@ module.exports.postOrders = (req, res, next) => {
 
 
 module.exports.getCheckout = (req, res, next) => {
-    res.render('/shop/checkout', {
-        pageTitle: 'Checkout',
-        path: '/checkout'
+    req.user
+    .populate('cart.items.productId')
+    .execPopulate() //helps to return a promise
+    .then( user => {
+        const products = user.cart.items;
+        let total =0;
+        products.forEach( p => {
+            total += p.quantity * p.productId.price
+        })
+        res.render('shop/checkout', {
+            pageTitle: 'Checkout',
+            path: '/checkout',
+            products: products,
+            totalSum: total
+        });
+    })
+    .catch( err => {
+        next(new Error(err));
     });
 }
 
 module.exports.getInvoice = (req, res, next) => {
     const orderId = req.params.orderId;
-
     //checking if currently logged in user placed the order
     Order.findById(orderId)
     .then(order => {

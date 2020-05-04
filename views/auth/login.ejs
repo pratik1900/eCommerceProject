@@ -1,40 +1,47 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/forms.css">
-    <link rel="stylesheet" href="/css/auth.css">
 </head>
 
 <body>
    <%- include('../includes/navigation.ejs') %>
-
     <main>
-        <% if(errorMessage && errorMessage.length > 0) { %> 
-            <div class="user-message user-message--error"><%= errorMessage %></div>
-        <% } %>
-        <form class="login-form" action="/login" method="POST">
-            <div class="form-control">
-                <label for="email">E-Mail</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    id="email" 
-                    value="<%= oldInput.email %>" 
-                >
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4 mx-auto mt-3">
+                    <% if(errorMessage && errorMessage.length > 0) { %> 
+                        <div class="alert alert-danger text-center"><%= errorMessage %></div>
+                    <% } %>
+                    <form action="/login" method="POST">
+                        <div class="form-group">
+                            <label for="email"><h3>E-Mail</h1></label>
+                            <input
+                                class="form-control" 
+                                type="email" 
+                                name="email" 
+                                id="email" 
+                                value="<%= oldInput.email %>" 
+                            >
+                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="password"><h3>Password</h3></label>
+                            <input
+                                class="form-control" 
+                                type="password" 
+                                name="password" 
+                                id="password" 
+                                value="<%= oldInput.password %>"
+                            >
+                        </div>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="text-center">
+                            <button class="btn btn-lg btn-primary" type="submit">Login</button>
+                        </div>
+                    </form>
+                    <div class="text-center">
+                        <a href="/reset">Reset Password</a>
+                    </div>
+                </div>
             </div>
-            <div class="form-control">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="password" 
-                    value="<%= oldInput.password %>"
-                >
-            </div>
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button class="btn" type="submit">Login</button>
-        </form>
-        
-        <div class="centered">
-            <a href="/reset">Reset Password</a>
         </div>
     </main>
 <%- include('../includes/end.ejs') %>

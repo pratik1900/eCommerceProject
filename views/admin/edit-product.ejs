@@ -1,63 +1,101 @@
 <%- include('../includes/head.ejs') %>
-    <link rel="stylesheet" href="/css/forms.css">
-    <link rel="stylesheet" href="/css/product.css">
 </head>
 
 <body>
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        <% if(errorMessage && errorMessage.length > 0) { %> 
-            <div class="user-message user-message--error"><%= errorMessage %></div>
-        <% } %>
-        <form class="product-form" action="/admin/<% if(editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST" enctype="multipart/form-data">
-            <div class="form-control">
-                <label for="title">Title</label>
-                <input 
-                    type="text" 
-                    name="title" 
-                    id="title" 
-                    value="<% if(editing || hasError) { %><%=product.title%><% } %>"
-                    class="<%= validationErrors && validationErrors.title? 'invalid' : '' %>"
-                >
-            </div>
-            <div class="form-control">
-                <label for="image">Image</label>
-                <input 
-                    type="file" 
-                    name="image" 
-                    id="image" 
-                >
-            </div>
-            <div class="form-control">
-                <label for="price">Price</label>
-                <input 
-                    type="number" 
-                    name="price" 
-                    id="price" 
-                    step="0.01" 
-                    value="<% if(editing || hasError) { %><%= product.price %><% } %>"
-                    class="<%= validationErrors && validationErrors.price? 'invalid' : '' %>"
-                >
-            </div>
-            <div class="form-control">
-                <label for="description">Description</label>
-                <textarea 
-                    name="description" 
-                    id="description" 
-                    rows="5"
-                    class="<%= validationErrors && validationErrors.description? 'invalid' : '' %>"
-                >
-                    <% if(editing || hasError) { %><%=product.description%><% } %>
-                </textarea>
-            </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4 mx-auto mt-3">
+                    <% if(errorMessage && errorMessage.length > 0) { %> 
+                        <div class="alert alert-danger text-center"><%= errorMessage %></div>
+                    <% } %>
+                    <form action="/admin/<% if(editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input 
+                                type="text" 
+                                name="title" 
+                                id="title" 
+                                value="<% if(editing || hasError) { %><%=product.title%><% } %>"
+                                class="form-control <%= validationErrors && validationErrors.title? 'invalid' : '' %>"
+                            >
+                        </div>
+                        <!-- <div class="form-group">
+                            <label for="image">Image</label>
+                            <input 
+                                type="file" 
+                                name="image" 
+                                id="image"
+                                class="form-control" 
+                            >
+                        </div> -->
+                        <div class="custom-file my-2">
+                            <label class="custom-file-label" for="image">Choose Image</label>
+                            <input type="file" name="image" class="custom-file-input" id="image">
+                          </div>
+                        <div class="form-group">
+                            <label for="price">Price</label>
+                            <input 
+                                type="number" 
+                                name="price" 
+                                id="price" 
+                                step="0.01" 
+                                value="<% if(editing || hasError) { %><%= product.price %><% } %>"
+                                class="form-control <%= validationErrors && validationErrors.price? 'invalid' : '' %>"
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select class="form-control" name="category" id = "category" required>
+                                <option value = "">Select Category</option>
+                                <option value = "appliances">Appliances</option>
+                                <option value = "baby">Baby</option>
+                                <option value = "beauty">Beauty</option>
+                                <option value = "books">Books</option>
+                                <option value = "clothing">Clothing</option>
+                                <option value = "computers">Computers</option>
+                                <option value = "electronics">Electronics</option>
+                                <option value = "fitness&outdoors">Fitness & Outdoors</option>
+                                <option value = "furniture">Furniture</option>
+                                <option value = "grocery">Grocery</option>
+                                <option value = "health">Health</option>
+                                <option value = "home&kitchen">Home & Kitchen</option>
+                                <option value = "jewellery">Jewellery</option>
+                                <option value = "luggage&bags">Luggage & Bags</option>
+                                <option value = "music">Music</option>
+                                <option value = "musicalinstruments">Musical Instruments</option>
+                                <option value = "officeproducts">Office Products</option>
+                                <option value = "petsupplies">Pet Supplies</option>
+                                <option value = "shoes">Shoes</option>
+                                <option value = "sports">Sports</option>
+                                <option value = "tools">Tools</option>
+                                <option value = "toys">Toys</option>
+                                <option value = "videogames">Video Games</option>
+                            </select>
+                        </div>
 
-            <% if(editing) { %>
-                <input name="productId" type="hidden" value="<%= product._id %>">
-            <% } %>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea 
+                                name="description" 
+                                id="description" 
+                                rows="5"
+                                class="form-control <%= validationErrors && validationErrors.description? 'invalid' : '' %>"
+                            ><% if(editing || hasError) { %><%=product.description%><% } %></textarea>
+                        </div>
 
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <button class="btn" type="submit"><% if(editing) { %> Update Product <% } else { %> Add Product <% } %> </button>
-        </form>
+                        <% if(editing) { %>
+                            <input name="productId" type="hidden" value="<%= product._id %>">
+                        <% } %>
+
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="btn btn-lg btn-primary" type="submit"><% if(editing) { %> Update Product <% } else { %> Add Product <% } %> </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
 <%- include('../includes/end.ejs') %>

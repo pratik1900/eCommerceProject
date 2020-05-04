@@ -12,6 +12,9 @@ router.get( '/', shopController.getIndex);
 // /products => GET
 router.get( '/products', shopController.getProducts);
 
+// /products/category/xxxxx => GET
+router.get( '/products/category/:categoryName', shopController.getCategoryProducts);
+
 // /products/xxxxxx => GET
 router.get('/products/:productId', shopController.getProduct);
 
@@ -30,9 +33,10 @@ router.get( '/orders', isAuth, shopController.getOrders);
 // /create-orders => POST
 router.post( '/create-order', isAuth, shopController.postOrders);
 
-// // /checkout => GET
-// router.get( '/checkout', shopController.getCheckout);
+// /checkout => GET
+router.get( '/checkout', isAuth, shopController.getCheckout);
 
+// /orders/orderId => GET
 router.get('/orders/:orderId', isAuth, shopController.getInvoice)
 
 module.exports = router;

@@ -1,16 +1,7 @@
-const backdrop = document.querySelector('.backdrop');
-const sideDrawer = document.querySelector('.mobile-nav');
-const menuToggle = document.querySelector('#side-menu-toggle');
+const navLink = document.querySelector('.nav .nav-link');
 
-function backdropClickHandler() {
-  backdrop.style.display = 'none';
-  sideDrawer.classList.remove('open');
+const makeActiveClass = () => {
+  navLink.classList.add('active');
 }
 
-function menuToggleClickHandler() {
-  backdrop.style.display = 'block';
-  sideDrawer.classList.add('open');
-}
-
-backdrop.addEventListener('click', backdropClickHandler);
-menuToggle.addEventListener('click', menuToggleClickHandler);
+navLink.parentElement.addEventListener('click', makeActiveClass);

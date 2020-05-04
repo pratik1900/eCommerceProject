@@ -5,22 +5,29 @@
         <%- include('../includes/navigation.ejs') %>
         <main>
             <% if (products.length > 0 ) { %>
-                <ul>
-                    <% products.forEach( p => { %>
-                        <li>
-                            <P><%= p.productId.title %>(<%= p.quantity %>)</P>
-                            <form action="/cart-delete-item" method="POST">
-                                <input type="hidden" name="productId" value="<%= p.productId._id %>">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <button class="btn" type="submit">Delete</button>
-                            </form>
-                        </li>
-                    <% }); %>
-                </ul>
-                <form action="/create-order" method="POST">
-                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                    <button class="btn">Order</button>
-                </form>
+                <div class="container">
+                    <div class="card mb-5">
+                        <div class="card-header">
+                            <h5 class="text-center">Items in Cart:</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <% products.forEach( p => { %>
+                                    <% if(p.productId) { %>
+                                        <li class="list-group-item"><%= p.productId.title %>(<%= p.quantity %>)
+                                            <form action="/cart-delete-item" method="POST">
+                                                <input type="hidden" name="productId" value="<%= p.productId._id %>">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                            </form>
+                                        </li>
+                                    <% } %>
+                                <% }); %>
+                            </ul>
+                        </div>
+                        <a class="btn btn-success" href="/checkout">Order</a>
+                    </div>
+                </div>
             <% } else { %>
                 <h1>No Products in Cart.</h1>
             <% } %>

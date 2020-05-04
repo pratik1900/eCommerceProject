@@ -19,6 +19,7 @@ module.exports.postAddProduct = (req, res, next) => {
     const title = req.body.title;
     const image = req.file;
     const price = req.body.price;
+    const category = req.body.category;
     const description = req.body.description;
     
     console.log('IMAGE',image);
@@ -31,6 +32,7 @@ module.exports.postAddProduct = (req, res, next) => {
             product: {
                 title: title,
                 price: price, 
+                category: category,
                 description: description
             },
             editing: false,
@@ -48,6 +50,7 @@ module.exports.postAddProduct = (req, res, next) => {
             product: {
                 title: title,
                 price: price, 
+                category: category,
                 description: description
             },
             editing: false,
@@ -61,6 +64,7 @@ module.exports.postAddProduct = (req, res, next) => {
     const product = new Product({
         title: title, 
         price: price, 
+        category: category,
         description: description,
         imageUrl: imageUrl,
         userId: req.user._id
@@ -106,6 +110,7 @@ module.exports.postEditProduct = (req, res, next) => {
     const title = req.body.title;
     const image = req.file;
     const price = req.body.price;
+    const category = req.body.category;
     const description = req.body.description;
 
     const errors = validationResult(req);
@@ -116,6 +121,7 @@ module.exports.postEditProduct = (req, res, next) => {
             product: {
                 title: title,
                 price: price, 
+                category: category,
                 description: description,
                 imageUrl: imageUrl,
                 _id: prodId
@@ -134,6 +140,7 @@ module.exports.postEditProduct = (req, res, next) => {
         }
         product.title = title; 
         product.price = price; 
+        product.category = category;
         product.description = description; 
         
         //if new image uploaded durig editing 
