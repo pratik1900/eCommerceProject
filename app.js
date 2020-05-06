@@ -1,4 +1,6 @@
 require('dotenv').config()
+const PORT = process.env.PORT || 3000;
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -119,7 +121,7 @@ app.use( (error, req, res, next) => {
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true,  useUnifiedTopology: true})
 .then(result => {
-    app.listen(3000, () => {
+    app.listen(PORT, () => {
         console.log('Server Started!');
     })
 })
