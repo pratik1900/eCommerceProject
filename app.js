@@ -117,7 +117,7 @@ app.use( (error, req, res, next) => {
     res.redirect('/500');
 });
 
-mongoose.connect(MONGO_URI)
+mongoose.connect(MONGO_URI, { useNewUrlParser: true,  useUnifiedTopology: true})
 .then(result => {
     app.listen(3000, () => {
         console.log('Server Started!');
