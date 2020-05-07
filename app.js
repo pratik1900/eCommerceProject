@@ -1,9 +1,8 @@
 require('dotenv').config()
-const PORT = process.env.PORT || 3000;
-
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
+const fs = require('fs');
 
 const errorController = require('./controllers/error');
 const adminRoutes = require('./routes/admin');
@@ -15,11 +14,14 @@ const MongoDBStore = require('connect-mongodb-session')(session); //returns a co
 const csrf = require('csurf'); //initialize after session middleware, and body parser initialization, before routes plug-in
 const flash = require('connect-flash'); //initialize after session middleware
 const multer = require('multer');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
 
 const User = require('./models/user');
 
 const mongoose = require('mongoose');
-const MONGO_URI = 'mongodb+srv://pbose:kjnptGrNoNUFfHEW@cluster0-ntjvz.mongodb.net/shop?retryWrites=true&w=majority';
+const MONGO_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-ntjvz.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`;
 const app = express();
 const csrfProtection = csrf();
 
@@ -56,11 +58,21 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+//for logging data into a file(used with morgan)
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, 'access.log'),
+    { flags: 'a'}
+)
+
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')); // storage - takes the storage configuration object, single - for single file in form; 'image' - name of the input field in the form that corresponds to the file
 app.use(express.static( path.join(__dirname, 'public') ));
 app.use('/images', express.static( path.join(__dirname, 'images') ));
+app.use(helmet());
+app.use(compression());
+app.use(morgan('combined', {stream: accessLogStream} ));
+
 //session middleware
 app.use(session({
     secret: 'my secret',
@@ -121,7 +133,7 @@ app.use( (error, req, res, next) => {
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true,  useUnifiedTopology: true})
 .then(result => {
-    app.listen(PORT, () => {
+    app.listen(process.env.PORT || 3000, () => {
         console.log('Server Started!');
     })
 })
