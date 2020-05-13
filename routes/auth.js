@@ -24,7 +24,19 @@ router.get('/signup', authController.getSignUp);
 
 router.post(
     '/signup', 
-    [
+    [   body('username')
+        .isAlphanumeric()
+        .withMessage('Username can contain only alphabets and numbers.')
+        .trim()
+        .custom((value, {req}) => { //this can be done here, or in the controller (preferable, as this deals with logic, not input mistakes. Keeping it here as an example of custom validators)
+            return User.findOne({username: value})
+            .then(userDoc => {
+                if (userDoc) {
+                    return Promise.reject('Username exists already, please pick a different one.');   //validator 
+                }
+            });
+        }),
+
         check('email')
         .isEmail()
         .withMessage('Please Enter a valid Email.')    //specific error msg for e-mail validation fail

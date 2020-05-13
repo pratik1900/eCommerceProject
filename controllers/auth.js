@@ -97,6 +97,7 @@ module.exports.getSignUp = (req, res, next) => {
 }
 
 module.exports.postSignUp = (req, res, next) => {
+    const  username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
@@ -120,6 +121,7 @@ module.exports.postSignUp = (req, res, next) => {
     bcrypt.hash(req.body.password, 12)
     .then(hashedPassword => {
         const user = new User({
+            username: username,
             email: req.body.email,
             password: hashedPassword,
             cart: { items: [] }

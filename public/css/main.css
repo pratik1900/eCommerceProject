@@ -12,13 +12,71 @@
   transform: scale(1.2);
 }
 
-.product-image-resize {
-  width: 100% !important;
-  max-height: 300 !important;
-}
+
 
 .wide {
   width: 100% !important;
+}
+
+/* Price Slider styles */
+#maxPriceSlider {
+  width: 100%;
+  height: 10px;
+  background: rgb(117,252,117);
+  -webkit-appearance: none;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
+  border-radius: 12px;
+  box-shadow: 0px 1px 5px 1px gray;
+}
+
+#maxPriceSlider:hover {
+  opacity: 1;
+}
+
+#maxPriceSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#maxPriceSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+/* #Price Slider styles */
+
+
+/* Star Rating System */
+
+input[type='radio'] {
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.star-label{
+  font-size: 2rem;
+  position: relative;
+  margin: auto;
+  color: goldenrod;
+  cursor: pointer;
+}
+
+
+.fa-star {
+  cursor: pointer;
+  font-size: 2rem;
+  color: goldenrod !important;
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 768px) {

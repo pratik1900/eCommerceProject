@@ -13,6 +13,16 @@
                     <% } %>
                     <form action="/signup" method="POST" novalidate>
                         <div class="form-group">
+                            <label for="username"><h3>Username</h3></label>
+                            <input
+                                class="form-control <%= validationErrors && validationErrors.username? 'invalid' : '' %>" 
+                                type="text" 
+                                name="username" 
+                                id="username" 
+                                value="<%= oldInput.username %>"
+                            >
+                            
+
                             <label for="email"><h3>E-Mail</h3></label>
                             <input
                                 class="form-control <%= validationErrors && validationErrors.email? 'invalid' : '' %>" 

@@ -1,3 +1,5 @@
+//Main Navbar Logic
+
 const navLink = document.querySelector('.nav .nav-link');
 
 const makeActiveClass = () => {
@@ -5,3 +7,5 @@ const makeActiveClass = () => {
 }
 
 navLink.parentElement.addEventListener('click', makeActiveClass);
+
+

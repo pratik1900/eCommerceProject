@@ -1,12 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const Pdfkit = require('pdfkit');
-const fileHelper = require('../util/file');
+const filterHelper = require('../util/filterOptionsBuilder');
 
 const ITEMS_PER_PAGE = 9;
 
 const Product = require('../models/product'); //importing Product model
 const Order = require('../models/order');//importing Order model 
+const Review = require('../models/review');
 
 //For displaying the Index page
 module.exports.getIndex = (req, res, next) => {
@@ -25,14 +26,17 @@ module.exports.getIndex = (req, res, next) => {
 
 //For displaying the Products page
 module.exports.getProducts = (req, res, next) => {
+    
     const page = Number(req.query.page) || 1;
     let totalItems;
 
-    Product.countDocuments()
+    const filterOpts = filterHelper.buildFilterOptionsObj(req.query);
+    
+    Product.countDocuments(filterOpts)
     .then(numProducts => {
         totalItems = numProducts;
 
-        return Product.find()
+        return Product.find(filterOpts)
         .skip( (page - 1) * ITEMS_PER_PAGE )
         .limit(ITEMS_PER_PAGE)
     })
@@ -263,3 +267,48 @@ module.exports.getInvoice = (req, res, next) => {
     })
     .catch(err => next(err));
 }
+
+//For submitting a product rating
+
+module.exports.postRating = (req, res, next) => {
+    const prodId = req.body.productId;
+    const submittedRating = Number(req.body.productRating);
+    const writtenReview = req.body.reviewContent;
+
+    console.log(submittedRating);
+    console.log(writtenReview);
+
+    Product.findById(prodId)
+    .then(product => {
+        if(!product){
+            throw new Error('Product not Found.')
+        }
+        const review = new Review({
+            text: writtenReview,
+            createdAt: new Date().toISOString().slice(0, 10),
+            author: {
+                id: req.user._id,
+                username: req.user.username
+            },
+            product: {
+                id: prodId
+            },
+            rating: submittedRating
+        }); 
+        review.save()
+        .then(review => {
+            product.overallRating = ((product.overallRating * product.num_ratings) + submittedRating) / (product.num_ratings + 1);
+            product.num_ratings += 1;
+            product.reviews.push(review._id)
+            product.save()
+            .then(result => {
+                res.redirect('/products');
+            })
+        })
+    })
+    .catch((err) => {
+        next(err)
+    });  
+}
+
+

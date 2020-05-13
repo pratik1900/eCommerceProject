@@ -1,14 +1,9 @@
-// require('dotenv').config()
+require('dotenv').config()
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require('fs');
-
-const errorController = require('./controllers/error');
-const adminRoutes = require('./routes/admin');
-const shopRoutes = require('./routes/shop');
-const authRoutes = require('./routes/auth');
-
+const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session); //returns a constructor
 const csrf = require('csurf'); //initialize after session middleware, and body parser initialization, before routes plug-in
@@ -17,27 +12,34 @@ const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
+const cloudinary = require('cloudinary').v2;
+
+
+const errorController = require('./controllers/error');
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 const User = require('./models/user');
 
-const mongoose = require('mongoose');
 const MONGO_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-ntjvz.mongodb.net/${process.env.MONGO_DEFAULT_DATABASE}?retryWrites=true&w=majority`;
 const app = express();
-const csrfProtection = csrf();
-
-// app.set("view engine", "pug");
 app.set("view engine", "ejs");
 
+const csrfProtection = csrf();
 
-
-
-//creating new store for storing sessions in the DB (as opposed to storing in memory which is the default)
-const mongoStore = new MongoDBStore({
-    uri: MONGO_URI,
-    collection: 'sessions'
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
 });
 
-//Multer config - configuring file storage and naming 
+
+//===================================================
+//Multer config - configuring file storage and naming
+//===================================================
+
+// const fileStorage = multer.memoryStorage();
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './images');
@@ -72,6 +74,17 @@ app.use('/images', express.static( path.join(__dirname, 'images') ));
 app.use(helmet());
 app.use(compression());
 app.use(morgan('combined', {stream: accessLogStream} ));
+
+
+//========================================
+//SESSION CONFIG
+//========================================
+
+//creating new store for storing sessions in the DB (as opposed to storing in memory which is the default)
+const mongoStore = new MongoDBStore({
+    uri: MONGO_URI,
+    collection: 'sessions'
+});
 
 //session middleware
 app.use(session({

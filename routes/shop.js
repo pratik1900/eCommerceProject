@@ -39,6 +39,11 @@ router.get( '/checkout', isAuth, shopController.getCheckout);
 // /orders/orderId => GET
 router.get('/orders/:orderId', isAuth, shopController.getInvoice)
 
+//RATE PRODUCT - /products/xxxxx/rate => POST
+router.post('/products/rate', shopController.postRating)
+
+
+
 module.exports = router;
 
   

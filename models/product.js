@@ -22,11 +22,29 @@ const productSchema = new Schema({
         type: String,
         required: false
     },
+    imageCloudId: {
+        type: String,
+        required: true
+    },
+    overallRating: {
+        type: Number,
+        default: 0
+    },
+    num_ratings: {
+        type: Number,
+        default: 0
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }
+    },
+    reviews: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Review"
+        }
+    ]
 });
 
 module.exports = mongoose.model('Product', productSchema);

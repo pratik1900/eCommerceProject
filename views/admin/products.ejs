@@ -12,7 +12,7 @@
                         <div class="row justify-content-center">
                             <% for (let product of prods) { %>
                                 <div class="card shadow col-lg-3 m-lg-3 col-md-5  m-md-2">
-                                    <img class="card-img-top" src="/<%= product.imageUrl %>" alt="<%= product.title %>">
+                                    <img class="card-img-top" src="<%= product.imageUrl %>" alt="<%= product.title %>">
                                     <div class="card-body">
                                         <h5 class="card-title">
                                             <%= product.title %>
@@ -26,7 +26,7 @@
                                         <a href="/admin/edit-product/<%= product._id %>" class="btn btn-outline-secondary">Edit</a>
                                         <input type="hidden" name="productId" value="<%= product._id %>">
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                        <button class="btn btn-outline-danger" type="button" onclick="deleteProduct(this)">Delete</button>
+                                        <a href="/admin/delete-product/<%= product._id %>" class="btn btn-outline-danger">Delete</a>
                                     </div>
                                 </div>
                             <% } %>

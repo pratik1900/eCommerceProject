@@ -1,0 +1,41 @@
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+    <div class="sidebar-sticky">
+      <h3 class="text-mute">Filter Products</h3>
+      <form method="GET" action="/products">
+
+        <div class="form-group">
+          <fieldset>
+            <legend>Minimum Review Score:</legend>
+            <div>
+              <input type="checkbox" id="5stars" name="minReviewScore" value="5">
+              <label for="5stars">5 Stars</label>
+            </div>
+            <div>
+              <input type="checkbox" id="4stars" name="minReviewScore" value="4">
+              <label for="4stars">4 Stars and above</label>
+            </div>
+            <div>
+              <input type="checkbox" id="3stars" name="minReviewScore" value="3">
+              <label for="3stars">3 Stars and above</label>
+            </div>
+            <div>
+              <input type="checkbox" id="2stars" name="minReviewScore" value="2">
+              <label for="2stars">2 Stars and above</label>
+            </div>
+            <div>
+              <input type="checkbox" id="1star" name="minReviewScore" value="1">
+              <label for="1star">1 Star and above</label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="form-group">
+          <label for="formControlRange">Maximum Price: <span id="maxPriceDisplay"></span> </label>
+          <input type="range" name="maxPrice" class="form-control-range" id="maxPriceSlider" min="0" max="1000">
+        </div>
+
+        <input type="submit" value="Filter" class="btn btn-success">
+
+      </form>
+    </div>
+  </nav>
