@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const reviewSchema = new Schema({
     text: {
         type: String,
-        required: true
+        required: false
     },
     createdAt: {
         type: Date, 
