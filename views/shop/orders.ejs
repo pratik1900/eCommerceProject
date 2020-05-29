@@ -20,69 +20,137 @@
                         <% order.products.forEach(p => { %>
                             <p class="card-text my-2"><%= p.product.title %> (<%= p.quantity %>)</p>
                             
+
                             
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal<%= p.product._id %>">
-                                Rate Product
-                            </button>
+                            <% Product.findById(p.product._id).then(prodObj => { %>
+                                <% prodObj.populate('reviews').execPopulate().then(populatedProd => { %>
+                                    <% if(populatedProd.reviews.length === 0){ %>
+                                        <% console.log('FLAG 2'); %>
 
 
-                            <!-- Modal (RATING & Review) -->
-                            <div class="modal fade" id="exampleModal<%= p.product._id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel"><%= p.product.title %></h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-
-                                            <!-- Rating Box -->
-                                            <div class="rating-box">
-                                                <h3>Rate the Product</h3>
-                                                <div class="ratings d-flex flex-row justify-content-around">
-                                                    <i class="far fa-star"></i>
-                                                    <i class="far fa-star"></i>
-                                                    <i class="far fa-star"></i>
-                                                    <i class="far fa-star"></i>
-                                                    <i class="far fa-star"></i>
+                                        <!-- Button trigger modal -->
+                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal<%= p.product._id %>">
+                                            Rate Product
+                                        </button>
+                                        <!-- Modal (RATING & Review) -->
+                                        <div class="modal fade" id="exampleModal<%= p.product._id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel"><%= p.product.title %></h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- Rating Box -->
+                                                        <div class="rating-box">
+                                                            <h3>Rate the Product</h3>
+                                                            <div class="ratings d-flex flex-row justify-content-around">
+                                                                <i class="far fa-star"></i>
+                                                                <i class="far fa-star"></i>
+                                                                <i class="far fa-star"></i>
+                                                                <i class="far fa-star"></i>
+                                                                <i class="far fa-star"></i>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Review Form -->
+                                                        <form action="/products/rate" method="POST">
+                                                            <div class="form-group">
+                                                                <textarea class="form-control" type="text" placeholder="Write a Review (Optional)" name="reviewContent" rows="10" cols="100"></textarea>
+                                                            </div>
+                                                            <input type="hidden" name="productId" id="productId" value="<%=p.product._id%>">
+                                                            <input type="hidden" name="productRating" id="productRating" value="0">
+                                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                            <div class="form-group text-center">
+                                                                <button type="submit" class="btn btn-primary">Rate</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
                                                 </div>
                                             </div>
-
-                                            <!-- Review Form -->
-                                            <form action="/products/rate" method="POST">
-
-                                                <div class="form-group">
-                                                    <textarea class="form-control" type="text" placeholder="Write a Review (Optional)" name="reviewContent" rows="10" cols="100"></textarea>
-                                                </div>
-
-                                                <input type="hidden" name="productId" id="productId" value="<%=p.product._id%>">
-                                                <input type="hidden" name="productRating" id="productRating" value="0">
-                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-                                                <div class="form-group text-center">
-                                                    <button type="submit" class="btn btn-primary">Rate</button>
-                                                </div>
-                                            </form>
                                         </div>
+                                    <% } %>
 
-                                        <div class="modal-footer">
+
+
+                                    <% populatedProd.reviews.forEach(review => { %>
                                         
-                                            
+                                        <% console.log('==================================='); %>
+                                        <% console.log('Product ID:',populatedProd._id); %>
+                                        <% console.log(review.author.id.toString()); %>
+                                        <% console.log(loggedInUser._id.toString()); %>
 
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }); %>
+                                        <% if(review.author.id.toString() === loggedInUser._id.toString() ) { %>
+                                            <% console.log('FLAG 1'); %>
+                                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal<%= p.product._id %>" disabled>
+                                                Already Rated 
+                                            </button>
+                                        <% } else { %>
+                                            <% console.log('FLAG 2'); %>
+
+                                        
+
+                                            <!-- Button trigger modal -->
+                                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModal<%= p.product._id %>">
+                                                Rate Product
+                                            </button>
+                                            <!-- Modal (RATING & Review) -->
+                                            <div class="modal fade" id="exampleModal<%= p.product._id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel"><%= p.product.title %></h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <!-- Rating Box -->
+                                                            <div class="rating-box">
+                                                                <h3>Rate the Product</h3>
+                                                                <div class="ratings d-flex flex-row justify-content-around">
+                                                                    <i class="far fa-star"></i>
+                                                                    <i class="far fa-star"></i>
+                                                                    <i class="far fa-star"></i>
+                                                                    <i class="far fa-star"></i>
+                                                                    <i class="far fa-star"></i>
+                                                                </div>
+                                                            </div>
+                                                            <!-- Review Form -->
+                                                            <form action="/products/rate" method="POST">
+                                                                <div class="form-group">
+                                                                    <textarea class="form-control" type="text" placeholder="Write a Review (Optional)" name="reviewContent" rows="10" cols="100"></textarea>
+                                                                </div>
+                                                                <input type="hidden" name="productId" id="productId" value="<%=p.product._id%>">
+                                                                <input type="hidden" name="productRating" id="productRating" value="0">
+                                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                                <div class="form-group text-center">
+                                                                    <button type="submit" class="btn btn-primary">Rate</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } %>
+
+
+                                    <% }) %>
+                                <% }) %>
+                            <% }) %>
+                        <% }) %>
                         <a href="/orders/<%= order._id %>" target="_blank" class="btn btn-sm btn-primary">Invoice</a>
+                    </div>
                 </div>
             <% }) %>
         <% } %>
     </main>
     <script src="../../js/ratingSystem.js"></script>
     <%- include('../includes/end.ejs') %>
-

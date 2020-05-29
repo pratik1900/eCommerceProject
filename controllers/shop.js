@@ -160,10 +160,12 @@ module.exports.getOrders = (req, res, next) => {
     Order.find({'user.userId' : req.user._id})
     .then( orders => {
         console.log(orders);
-        res.render('shop/orders', {
+        res.render('shop/order2', {
             pageTitle: 'Your Orders',
             path: '/orders',
-            orders: orders
+            orders: orders,
+            loggedInUser: req.user,
+            Product: Product
         });
     })
     .catch( err => {
