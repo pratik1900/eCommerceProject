@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Pdfkit = require('pdfkit');
 const filterHelper = require('../util/filterOptionsBuilder');
+const cloudinary = require('cloudinary').v2;
 
 const ITEMS_PER_PAGE = 9;
 
@@ -16,7 +17,8 @@ module.exports.getIndex = (req, res, next) => {
         res.render('shop/index', {
             prods: products, 
             pageTitle: "Index", 
-            path: "/"
+            path: "/",
+            cloudinary: cloudinary
         });
     })
     .catch( err => {
