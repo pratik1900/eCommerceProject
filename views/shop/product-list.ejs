@@ -17,7 +17,7 @@
             <% for (let product of prods) { %>
                 <div class="card shadow col-lg-3 m-lg-3 col-md-5  m-md-2">
                   <div class="zoom">
-                    <img class="card-img-top" width="100%" height="225" src="<%= cloudinary.url(`${product.imageCloudId}`, { width: 512, crop: "scale", fetch_format: "auto" })%>" alt="<%= product.title %>">
+                    <img class="card-img-top" width="100%" height="225" src="<%= cloudinary.url(`${product.imageCloudId}`, { width: 512, crop: "scale", fetch_format: "auto", secure: true })%>" alt="<%= product.title %>">
                   </div>
                   <div class="card-body">
                     <h5 class="card-title">
