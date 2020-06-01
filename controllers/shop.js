@@ -12,18 +12,11 @@ const Review = require('../models/review');
 
 //For displaying the Index page
 module.exports.getIndex = (req, res, next) => {
-    Product.find()
-    .then( products => {
-        res.render('shop/index', {
-            prods: products, 
-            pageTitle: "Index", 
-            path: "/",
-            cloudinary: cloudinary
-        });
+    res.render('shop/index', { 
+        pageTitle: "Index", 
+        path: "/",
+        cloudinary: cloudinary
     })
-    .catch( err => {
-        next(new Error(err));
-    });
 }
 
 //For displaying the Products page
