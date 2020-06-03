@@ -144,12 +144,6 @@ app.use( (error, req, res, next) => {
     res.redirect('/500');
 });
 
-app.use((req, res, next) => {
-    res.setHeader("Cache-Control", "public, max-age=2592000");
-    res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
-    next()
-})
-
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true,  useUnifiedTopology: true})
 .then(result => {

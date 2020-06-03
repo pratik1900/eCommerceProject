@@ -29,7 +29,7 @@
                     <p class="card-text">
                       <%= product.description %>
                     </p>
-                    <a class="card-link" href="/products/<%= product._id %>" class="btn">Details</a>
+                    <a class="card-link stretched-link" href="/products/<%= product._id %>" class="btn">Details</a>
                     <% if(isAuthenticated) { %>
                       <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                     <% } %>
