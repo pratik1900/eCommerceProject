@@ -1,4 +1,4 @@
-// require('dotenv').config()
+require('dotenv').config()
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -143,6 +143,13 @@ app.use( (error, req, res, next) => {
     console.log(error);
     res.redirect('/500');
 });
+
+app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "public, max-age=2592000");
+    res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+    next()
+})
+
 
 mongoose.connect(MONGO_URI, { useNewUrlParser: true,  useUnifiedTopology: true})
 .then(result => {
