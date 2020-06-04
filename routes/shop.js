@@ -12,9 +12,6 @@ router.get( '/', shopController.getIndex);
 // /products => GET
 router.get( '/products', shopController.getProducts);
 
-// /products/category/xxxxx => GET
-router.get( '/products/category/:categoryName', shopController.getCategoryProducts);
-
 // /products/xxxxxx => GET
 router.get('/products/:productId', shopController.getProduct);
 

@@ -7,9 +7,15 @@ module.exports.buildFilterOptionsObj = (queryObj) => {
 
     let filterOptions = {};
 
+    const category = queryObj.category;
     const maxPrice = queryObj.maxPrice;
     const searchQuery = queryObj.search;
     let minReviewScore = queryObj.minReviewScore;
+
+    //Category Filtering
+    if(category) {
+        filterOptions = { category : category }
+    }
 
     //Search Query Filtering
     if(searchQuery) {
