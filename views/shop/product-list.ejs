@@ -21,7 +21,7 @@
                   </div>
                   <div class="card-body">
                     <h5 class="card-title">
-                      <%= product.title %>
+                      <a href="/products/<%= product._id %>"><%= product.title %></a>
                     </h5>
                     <h6 class="card-subtitle mb-2 text-muted">
                       $<%= product.price %>
@@ -29,7 +29,7 @@
                     <p class="card-text">
                       <%= product.description %>
                     </p>
-                    <a class="card-link stretched-link" href="/products/<%= product._id %>" class="btn">Details</a>
+                    <a class="card-link" href="/products/<%= product._id %>" class="btn">Details</a>
                     <% if(isAuthenticated) { %>
                       <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                     <% } %>

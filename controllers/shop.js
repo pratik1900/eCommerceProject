@@ -10,6 +10,8 @@ const Product = require('../models/product'); //importing Product model
 const Order = require('../models/order');//importing Order model 
 const Review = require('../models/review');
 
+const checkIfReviewedBefore = require('../util/checkIfReviewedBefore');
+
 //For displaying the Index page
 module.exports.getIndex = (req, res, next) => {
     res.render('shop/index', { 
@@ -61,7 +63,10 @@ module.exports.getProduct = (req, res, next) => {
         res.render('shop/product-detail', {
             pageTitle: product.title,
             product: product,
-            path: '/products'
+            path: '/products',
+            loggedInUser: req.user,
+            cloudinary: cloudinary,
+            Product: Product
         });
     })
     .catch( err => {
@@ -122,8 +127,8 @@ module.exports.postCartDeleteProduct = (req, res, next) => {
 module.exports.getOrders = (req, res, next) => {
     Order.find({'user.userId' : req.user._id})
     .then( orders => {
-        console.log(orders);
-        res.render('shop/order2', {
+        checkIfReviewedBefore(orders, req.user);
+        res.render('shop/order3', {
             pageTitle: 'Your Orders',
             path: '/orders',
             orders: orders,
@@ -135,6 +140,8 @@ module.exports.getOrders = (req, res, next) => {
         next(new Error(err));
     });
 }
+
+
 
 module.exports.postOrders = (req, res, next) => {
     req.user
