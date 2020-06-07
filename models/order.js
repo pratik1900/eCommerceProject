@@ -10,6 +10,10 @@ const orderSchema = new Schema({
         quantity: {
             type: Number,
             required: true
+        },
+        isReviewed: {
+            type: Boolean,
+            default: false
         }
     }],
     user: {

@@ -10,8 +10,6 @@ const Product = require('../models/product'); //importing Product model
 const Order = require('../models/order');//importing Order model 
 const Review = require('../models/review');
 
-const checkIfReviewedBefore = require('../util/checkIfReviewedBefore');
-
 //For displaying the Index page
 module.exports.getIndex = (req, res, next) => {
     res.render('shop/index', { 
@@ -127,8 +125,7 @@ module.exports.postCartDeleteProduct = (req, res, next) => {
 module.exports.getOrders = (req, res, next) => {
     Order.find({'user.userId' : req.user._id})
     .then( orders => {
-        checkIfReviewedBefore(orders, req.user);
-        res.render('shop/order3', {
+        res.render('shop/orders', {
             pageTitle: 'Your Orders',
             path: '/orders',
             orders: orders,
@@ -244,6 +241,7 @@ module.exports.getInvoice = (req, res, next) => {
 
 module.exports.postRating = (req, res, next) => {
     const prodId = req.body.productId;
+    const orderId = req.body.orderId;
     const submittedRating = Number(req.body.productRating);
     const writtenReview = req.body.reviewContent;
 
@@ -275,6 +273,24 @@ module.exports.postRating = (req, res, next) => {
             product.save()
             .then(result => {
                 res.redirect('/products');
+            })
+        })
+        .then(() => {
+            console.log(orderId);
+            Order.findById(orderId)
+            .then(order => {
+                console.log(order.products);
+                const updatedProds = order.products.map(prod => {
+                    if(prod.product._id.toString() === prodId.toString()){
+                        console.log('BINGOOO');
+                        prod.isReviewed = true;
+                    }
+                    // console.log(prod);
+                    return prod
+                })
+                order.products = updatedProds;
+                console.log('==========',order.products);
+                order.save()
             })
         })
     })
